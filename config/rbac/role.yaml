@@ -1,0 +1,84 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogsaccesspolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogsaccesspolicies/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogsaccesspolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogstenants
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogstenants/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogstenants/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogstokens
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogstokens/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - loki.hamravesh.com
+  resources:
+  - grafanaenterpriselogstokens/status
+  verbs:
+  - get
+  - patch
+  - update

@@ -1,0 +1,12 @@
+apiVersion: loki.hamravesh.com/v1alpha1
+kind: GrafanaEnterpriseLogsTenant
+metadata:
+  labels:
+    app.kubernetes.io/name: grafanaenterpriselogstenant
+    app.kubernetes.io/instance: grafanaenterpriselogstenant-sample
+    app.kubernetes.io/part-of: gel
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: gel
+  name: grafanaenterpriselogstenant-sample
+spec:
+  # TODO(user): Add fields here

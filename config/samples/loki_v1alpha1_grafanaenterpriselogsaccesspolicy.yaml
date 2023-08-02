@@ -1,0 +1,12 @@
+apiVersion: loki.hamravesh.com/v1alpha1
+kind: GrafanaEnterpriseLogsAccessPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: grafanaenterpriselogsaccesspolicy
+    app.kubernetes.io/instance: grafanaenterpriselogsaccesspolicy-sample
+    app.kubernetes.io/part-of: gel
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: gel
+  name: grafanaenterpriselogsaccesspolicy-sample
+spec:
+  # TODO(user): Add fields here

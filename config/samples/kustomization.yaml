@@ -1,0 +1,6 @@
+## Append samples of your project ##
+resources:
+- loki_v1alpha1_grafanaenterpriselogstenant.yaml
+- loki_v1alpha1_grafanaenterpriselogsaccesspolicy.yaml
+- loki_v1alpha1_grafanaenterpriselogstoken.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

@@ -36,14 +36,44 @@ spec:
             description: GrafanaEnterpriseLogsTenantSpec defines the desired state
               of GrafanaEnterpriseLogsTenant
             properties:
-              foo:
-                description: Foo is an example field of GrafanaEnterpriseLogsTenant.
-                  Edit grafanaenterpriselogstenant_types.go to remove/update
-                type: string
+              lokiEnterpriseAdminApi:
+                description: Loki Enterprise Admin API credentials and addresses
+                properties:
+                  address:
+                    type: string
+                  rootTokenSecretRef:
+                    description: Loki Admin Token
+                    properties:
+                      matchLabels:
+                        description: MatchLabels Selector for finding the token secret
+                        properties:
+                          app:
+                            type: string
+                        type: object
+                    type: object
+                type: object
+              tenantInfo:
+                description: 'EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+                  NOTE: json tags are required.  Any new fields you add must have
+                  json tags for the fields to be serialized.'
+                properties:
+                  clusterName:
+                    type: string
+                  displayName:
+                    type: string
+                  name:
+                    type: string
+                type: object
             type: object
           status:
             description: GrafanaEnterpriseLogsTenantStatus defines the observed state
               of GrafanaEnterpriseLogsTenant
+            properties:
+              status:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
             type: object
         type: object
     served: true

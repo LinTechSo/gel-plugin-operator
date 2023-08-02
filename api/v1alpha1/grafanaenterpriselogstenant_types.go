@@ -22,20 +22,26 @@ import (
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+type TenantInfo struct {
+	Name        string `json:"name,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	ClusterName string `json:"clusterName,omitempty"`
+}
 
 // GrafanaEnterpriseLogsTenantSpec defines the desired state of GrafanaEnterpriseLogsTenant
 type GrafanaEnterpriseLogsTenantSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of GrafanaEnterpriseLogsTenant. Edit grafanaenterpriselogstenant_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	TenantInfo             TenantInfo             `json:"tenantInfo,omitempty"`
+	LokiEnterpriseAdminAPI LokiEnterpriseAdminAPI `json:"lokiEnterpriseAdminApi,omitempty"`
 }
 
 // GrafanaEnterpriseLogsTenantStatus defines the observed state of GrafanaEnterpriseLogsTenant
 type GrafanaEnterpriseLogsTenantStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Status string `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true

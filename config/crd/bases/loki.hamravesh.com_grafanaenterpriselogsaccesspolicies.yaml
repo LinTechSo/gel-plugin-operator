@@ -36,14 +36,51 @@ spec:
             description: GrafanaEnterpriseLogsAccessPolicySpec defines the desired
               state of GrafanaEnterpriseLogsAccessPolicy
             properties:
-              foo:
-                description: Foo is an example field of GrafanaEnterpriseLogsAccessPolicy.
-                  Edit grafanaenterpriselogsaccesspolicy_types.go to remove/update
-                type: string
+              lokiEnterpriseAdminApi:
+                description: Loki Enterprise Admin API credentials and addresses
+                properties:
+                  address:
+                    type: string
+                  rootTokenSecretRef:
+                    description: Loki Admin Token
+                    properties:
+                      matchLabels:
+                        description: MatchLabels Selector for finding the token secret
+                        properties:
+                          app:
+                            type: string
+                        type: object
+                    type: object
+                type: object
+              tenantInfoRef:
+                description: 'EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+                  NOTE: json tags are required.  Any new fields you add must have
+                  json tags for the fields to be serialized. Desired AccessPolicy
+                  configurations'
+                properties:
+                  accessAccessPolicies:
+                    items:
+                      type: string
+                    type: array
+                  clusterName:
+                    type: string
+                  labelSelectors:
+                    items:
+                      type: string
+                    type: array
+                  tenantName:
+                    type: string
+                type: object
             type: object
           status:
             description: GrafanaEnterpriseLogsAccessPolicyStatus defines the observed
               state of GrafanaEnterpriseLogsAccessPolicy
+            properties:
+              status:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
             type: object
         type: object
     served: true

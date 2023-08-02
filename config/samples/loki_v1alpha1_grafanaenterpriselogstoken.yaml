@@ -9,4 +9,11 @@ metadata:
     app.kubernetes.io/created-by: gel
   name: grafanaenterpriselogstoken-sample
 spec:
-  # TODO(user): Add fields here
+  accessPolicyRef: 
+    name: "access-policy-sample"
+    # expiration: "2024-03-01T17:37:59.341728283Z"
+  lokiEnterpriseAdminApi:
+    address: ""
+    rootTokenSecretRef:
+        matchLabels:
+          app: loki-token-secret

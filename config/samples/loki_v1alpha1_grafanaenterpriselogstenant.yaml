@@ -9,4 +9,12 @@ metadata:
     app.kubernetes.io/created-by: gel
   name: grafanaenterpriselogstenant-sample
 spec:
-  # TODO(user): Add fields here
+  tenantInfo:
+    name: "parham"
+    displayName: "parham"
+    clusterName: "loki"
+  lokiEnterpriseAdminApi:
+    address: ""
+    rootTokenSecretRef:
+        matchLabels:
+          app: loki-token-secret

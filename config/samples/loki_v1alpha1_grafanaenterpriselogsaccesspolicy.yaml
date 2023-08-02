@@ -9,4 +9,17 @@ metadata:
     app.kubernetes.io/created-by: gel
   name: grafanaenterpriselogsaccesspolicy-sample
 spec:
-  # TODO(user): Add fields here
+  tenantInfoRef: 
+    tenantName: "parham"
+    clusterName: "loki"
+    accessAccessPolicies:
+      -  "logs:read"
+      -  "logs:write"
+    labelSelectors:
+      - '{foo="bar"}'
+      - '{name="hello"}'
+  lokiEnterpriseAdminApi:
+    address: ""
+    rootTokenSecretRef:
+        matchLabels:
+          app: loki-token-secret

@@ -57,6 +57,7 @@ type GrafanaEnterpriseLogsAccessPolicyStatus struct {
 type GrafanaEnterpriseLogsAccessPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Finalizers        []string `json:"finalizers,omitempty"`
 
 	Spec   GrafanaEnterpriseLogsAccessPolicySpec   `json:"spec,omitempty"`
 	Status GrafanaEnterpriseLogsAccessPolicyStatus `json:"status,omitempty"`

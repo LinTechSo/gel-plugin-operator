@@ -12,16 +12,12 @@ func CreateAccessPolicyApiRequest(AccessPolicyData []byte, err error) (string, e
 	var AccessPolicyUrlPrefix = "/admin/api/v3/accesspolicies"
 	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
 	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
-	var Address = LokiEndpointAddress + AccessPolicyUrlPrefix
-
 	// Check if the environment variable is set
-	if LokiEndpointAddress == "" {
-		fmt.Println("Loki_Endpoint_Address is not set")
+	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
+		fmt.Println("ENVs are not set")
+		return "", err
 	}
-	if LokiAdminApiToken == "" {
-		fmt.Println("Loki_Admin_Api_Token is not set")
-	}
-
+	var Address = LokiEndpointAddress + AccessPolicyUrlPrefix
 	username := ""
 	password := string(LokiAdminApiToken)
 
@@ -59,19 +55,17 @@ func CreateAccessPolicyApiRequest(AccessPolicyData []byte, err error) (string, e
 	return "", err
 }
 
-func CreateTenantApiRequest(TenantName string, DisplayName string, ClusterName string, err error) (string, error) {
+func CreateTenantApiRequest(TenantName string, DisplayName string, ClusterName string, status string, err error) (string, error) {
 	var tenantUrlPrefix = "/admin/api/v3/tenants"
 	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
 	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
-	var Address = LokiEndpointAddress + tenantUrlPrefix
 	// Check if the environment variable is set
-	if LokiEndpointAddress == "" {
-		fmt.Println("Loki_Endpoint_Address is not set")
-	}
-	if LokiAdminApiToken == "" {
-		fmt.Println("Loki_Admin_Api_Token is not set")
+	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
+		fmt.Println("ENVs are not set")
+		return "", err
 	}
 
+	var Address = LokiEndpointAddress + tenantUrlPrefix
 	// fmt.Println(Address)
 	// fmt.Println(LokiAdminApiToken)
 
@@ -83,7 +77,7 @@ func CreateTenantApiRequest(TenantName string, DisplayName string, ClusterName s
 
 	postData := strings.NewReader(
 		fmt.Sprintf(
-			`{"name":"%s","display_name":"%s","cluster":"%s"}`, TenantName, DisplayName, ClusterName),
+			`{"name":"%s","display_name":"%s","cluster":"%s", "status":"%s"}`, TenantName, DisplayName, ClusterName, status),
 	)
 	resp, err := http.NewRequest("POST", Address, postData)
 	if err != nil {
@@ -115,4 +109,60 @@ func CreateTenantApiRequest(TenantName string, DisplayName string, ClusterName s
 
 func CreateTokenApiRequest() {
 	fmt.Println("Hello from CreateTokenApiRequest")
+}
+
+func DeleteTenant(TenantName string, DisplayName string, ClusterName string, status string, err error) (string, error) {
+	var tenantUrlPrefix = "/admin/api/v3/tenants/"
+	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
+	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
+	// Check if the environment variable is set
+	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
+		fmt.Println("ENVs are not set")
+		return "", err
+	}
+
+	var Address = LokiEndpointAddress + tenantUrlPrefix + TenantName
+	fmt.Println(Address)
+	username := ""
+	password := string(LokiAdminApiToken)
+
+	auth := username + ":" + password
+	basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+
+	postData := strings.NewReader(
+		fmt.Sprintf(
+			`{"cluster":"%s", "status":"%s"}`, ClusterName, status),
+	)
+	fmt.Println(postData)
+	resp, err := http.NewRequest("PUT", Address, postData)
+	if err != nil {
+		// Handle the error
+		fmt.Println(err, "unable to request")
+		return "", err
+	}
+	resp.Header.Set("Authorization", basicAuth)
+	resp.Header.Add("If-Match", "1")
+	resp.Header.Add("Content-Type", "text/plain")
+
+	client := &http.Client{}
+	result, err := client.Do(resp)
+	if err != nil {
+		// Handle the error
+		fmt.Println(err, "unable to get client result")
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code and handle accordingly
+	if result.StatusCode != http.StatusOK {
+		// Handle non-OK status codes
+	}
+
+	fmt.Println(result.Status)
+
+	return "", err
+}
+
+func DeleteAccessPolicy() {
+	fmt.Println("Hello from DeleteAccessPolicy")
 }

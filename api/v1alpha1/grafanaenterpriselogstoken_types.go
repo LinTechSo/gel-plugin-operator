@@ -50,6 +50,7 @@ type GrafanaEnterpriseLogsTokenStatus struct {
 type GrafanaEnterpriseLogsToken struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Finalizers        []string `json:"finalizers,omitempty"`
 
 	Spec   GrafanaEnterpriseLogsTokenSpec   `json:"spec,omitempty"`
 	Status GrafanaEnterpriseLogsTokenStatus `json:"status,omitempty"`

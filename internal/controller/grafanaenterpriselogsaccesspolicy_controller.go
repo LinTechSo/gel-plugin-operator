@@ -69,6 +69,8 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 		// Return and don't requeue
 		return ctrl.Result{}, nil
 	}
+	// Fetch metadataName
+	var metadataName = instance.ObjectMeta.Name
 	// Define the accessScope
 	var ac = instance.Spec.TenantInfoRef.AccessPolicies
 	var scopes []string
@@ -95,8 +97,8 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 	}
 
 	data := map[string]interface{}{
-		"name":         tenant.TenantName,
-		"display_name": tenant.TenantName,
+		"name":         metadataName,
+		"display_name": metadataName,
 		"realms":       []map[string]interface{}{realm},
 		"scopes":       scopes,
 	}

@@ -41,22 +41,8 @@ spec:
                   name:
                     type: string
                 type: object
-              lokiEnterpriseAdminApi:
-                description: Loki Enterprise Admin API credentials and addresses
-                properties:
-                  address:
-                    type: string
-                  rootTokenSecretRef:
-                    description: Loki Admin Token
-                    properties:
-                      matchLabels:
-                        description: MatchLabels Selector for finding the token secret
-                        properties:
-                          app:
-                            type: string
-                        type: object
-                    type: object
-                type: object
+              expirationTime:
+                type: string
             type: object
           status:
             description: GrafanaEnterpriseLogsTokenStatus defines the observed state

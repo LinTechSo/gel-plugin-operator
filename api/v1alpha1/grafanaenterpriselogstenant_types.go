@@ -33,8 +33,7 @@ type GrafanaEnterpriseLogsTenantSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	TenantInfo             TenantInfo             `json:"tenantInfo,omitempty"`
-	LokiEnterpriseAdminAPI LokiEnterpriseAdminAPI `json:"lokiEnterpriseAdminApi,omitempty"`
+	TenantInfo TenantInfo `json:"tenantInfo,omitempty"`
 }
 
 // GrafanaEnterpriseLogsTenantStatus defines the observed state of GrafanaEnterpriseLogsTenant

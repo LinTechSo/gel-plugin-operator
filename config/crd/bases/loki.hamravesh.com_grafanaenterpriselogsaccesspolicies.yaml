@@ -36,29 +36,13 @@ spec:
             description: GrafanaEnterpriseLogsAccessPolicySpec defines the desired
               state of GrafanaEnterpriseLogsAccessPolicy
             properties:
-              lokiEnterpriseAdminApi:
-                description: Loki Enterprise Admin API credentials and addresses
-                properties:
-                  address:
-                    type: string
-                  rootTokenSecretRef:
-                    description: Loki Admin Token
-                    properties:
-                      matchLabels:
-                        description: MatchLabels Selector for finding the token secret
-                        properties:
-                          app:
-                            type: string
-                        type: object
-                    type: object
-                type: object
               tenantInfoRef:
                 description: 'EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
                   NOTE: json tags are required.  Any new fields you add must have
                   json tags for the fields to be serialized. Desired AccessPolicy
                   configurations'
                 properties:
-                  accessAccessPolicies:
+                  accessPolicies:
                     items:
                       type: string
                     type: array

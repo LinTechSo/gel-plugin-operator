@@ -11,9 +11,4 @@ metadata:
 spec:
   accessPolicyRef: 
     name: "access-policy-sample"
-    # expiration: "2024-03-01T17:37:59.341728283Z"
-  lokiEnterpriseAdminApi:
-    address: ""
-    rootTokenSecretRef:
-        matchLabels:
-          app: loki-token-secret
+    expirationTime: "2024-03-01T17:37:59.341728283Z"

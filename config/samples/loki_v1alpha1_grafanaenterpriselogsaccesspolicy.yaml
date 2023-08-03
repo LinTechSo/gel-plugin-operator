@@ -12,14 +12,9 @@ spec:
   tenantInfoRef: 
     tenantName: "parham"
     clusterName: "loki"
-    accessAccessPolicies:
+    accessPolicies:
       -  "logs:read"
       -  "logs:write"
     labelSelectors:
       - '{foo="bar"}'
       - '{name="hello"}'
-  lokiEnterpriseAdminApi:
-    address: ""
-    rootTokenSecretRef:
-        matchLabels:
-          app: loki-token-secret

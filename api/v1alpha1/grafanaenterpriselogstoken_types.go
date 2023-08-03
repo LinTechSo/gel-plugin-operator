@@ -32,8 +32,8 @@ type GrafanaEnterpriseLogsTokenSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	AccessPolicyRef        AccessPolicyRef        `json:"accessPolicyRef,omitempty"`
-	LokiEnterpriseAdminAPI LokiEnterpriseAdminAPI `json:"lokiEnterpriseAdminApi,omitempty"`
+	AccessPolicyRef AccessPolicyRef `json:"accessPolicyRef,omitempty"`
+	ExpirationTime  string          `json:"expirationTime,omitempty"`
 }
 
 // GrafanaEnterpriseLogsTokenStatus defines the observed state of GrafanaEnterpriseLogsToken

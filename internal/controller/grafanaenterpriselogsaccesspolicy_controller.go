@@ -18,11 +18,15 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	http "github.com/LinTechSo/gel-plugin-operator/internal/http"
 
 	lokiv1alpha1 "github.com/LinTechSo/gel-plugin-operator/api/v1alpha1"
 )
@@ -49,9 +53,86 @@ type GrafanaEnterpriseLogsAccessPolicyReconciler struct {
 func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	rlog := log.Log.WithValues("loki", req.NamespacedName)
+	rlog.Info("Reconciling AccessPolicy creation request")
+
+	// Fetch the GrafanaEnterpriseLogsAccessPolicy instance
+	instance := &lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy{}
+	err := r.Get(ctx, req.NamespacedName, instance)
+	if err != nil {
+		if client.IgnoreNotFound(err) != nil {
+			rlog.Error(err, "unable to list GrafanaEnterpriseLogsAccessPolicy")
+			return ctrl.Result{}, err
+		}
+		// Request object not found, could have been deleted after reconcile request.
+		// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+		// Return and don't requeue
+		return ctrl.Result{}, nil
+	}
+	// Define the accessScope
+	var ac = instance.Spec.TenantInfoRef.AccessPolicies
+	var scopes []string
+	for _, acpo := range ac {
+		scopes = append(scopes, acpo)
+	}
+
+	// Define the labelSelector
+	var ls = instance.Spec.TenantInfoRef.LabelSelectors
+	labelPolicies := make([]map[string]string, 0)
+	for _, selector := range ls {
+		policy := map[string]string{
+			"selector": selector,
+		}
+		labelPolicies = append(labelPolicies, policy)
+	}
+
+	// Create a json list request from the GrafanaEnterpriseLogsAccessPolicy object
+	var tenant = instance.Spec.TenantInfoRef
+	realm := map[string]interface{}{
+		"cluster":        tenant.ClusterName,
+		"label_policies": labelPolicies,
+		"tenant":         tenant.TenantName,
+	}
+
+	data := map[string]interface{}{
+		"name":         tenant.TenantName,
+		"display_name": tenant.TenantName,
+		"realms":       []map[string]interface{}{realm},
+		"scopes":       scopes,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshaling:", err)
+		return ctrl.Result{}, err
+	}
+
+	rlog.Info("Requesting AccessPolicy creation")
+	_, err = http.CreateAccessPolicyApiRequest(jsonData, err)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
+		// Object is being deleted, perform cleanup or other actions here
+
+		// Example: Delete associated resources or perform other cleanup
+		err := r.deleteAssociatedResources(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
+		// Object has been deleted, no need to requeue
+		return ctrl.Result{}, nil
+	}
 
 	return ctrl.Result{}, nil
+}
+
+// deleteAssociatedResources performs the cleanup of associated resources
+func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) deleteAssociatedResources(ctx context.Context, obj *lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy) error {
+	// Your logic for deleting associated resources here...
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

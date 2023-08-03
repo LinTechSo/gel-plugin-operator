@@ -13,8 +13,3 @@ spec:
     name: "parham"
     displayName: "parham"
     clusterName: "loki"
-  lokiEnterpriseAdminApi:
-    address: ""
-    rootTokenSecretRef:
-        matchLabels:
-          app: loki-token-secret

@@ -24,10 +24,10 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 // Desired AccessPolicy configurations
 type TenantInfoRef struct {
-	TenantName           string   `json:"tenantName,omitempty"`
-	ClusterName          string   `json:"clusterName,omitempty"`
-	AccessAccessPolicies []string `json:"accessAccessPolicies,omitempty"`
-	LabelSelectors       []string `json:"labelSelectors,omitempty"`
+	TenantName     string   `json:"tenantName,omitempty"`
+	ClusterName    string   `json:"clusterName,omitempty"`
+	AccessPolicies []string `json:"accessPolicies,omitempty"`
+	LabelSelectors []string `json:"labelSelectors,omitempty"`
 }
 
 // MatchLabels Selector for finding the token secret
@@ -35,24 +35,12 @@ type MatchLabels struct {
 	App string `json:"app,omitempty"`
 }
 
-// Loki Admin Token
-type RootTokenSecretRef struct {
-	MatchLabels MatchLabels `json:"matchLabels,omitempty"`
-}
-
-// Loki Enterprise Admin API credentials and addresses
-type LokiEnterpriseAdminAPI struct {
-	Address            string             `json:"address,omitempty"`
-	RootTokenSecretRef RootTokenSecretRef `json:"rootTokenSecretRef,omitempty"`
-}
-
 // GrafanaEnterpriseLogsAccessPolicySpec defines the desired state of GrafanaEnterpriseLogsAccessPolicy
 type GrafanaEnterpriseLogsAccessPolicySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	TenantInfoRef          TenantInfoRef          `json:"tenantInfoRef,omitempty"`
-	LokiEnterpriseAdminAPI LokiEnterpriseAdminAPI `json:"lokiEnterpriseAdminApi,omitempty"`
+	TenantInfoRef TenantInfoRef `json:"tenantInfoRef,omitempty"`
 }
 
 // GrafanaEnterpriseLogsAccessPolicyStatus defines the observed state of GrafanaEnterpriseLogsAccessPolicy

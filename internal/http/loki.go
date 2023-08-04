@@ -163,6 +163,50 @@ func DeleteTenant(TenantName string, DisplayName string, ClusterName string, sta
 	return "", err
 }
 
-func DeleteAccessPolicy() {
-	fmt.Println("Hello from DeleteAccessPolicy")
+func DeleteAccessPolicy(jsonData []byte, tenant string, err error) (string, error) {
+	var AccessPolicyUrlPrefix = "/admin/api/v3/accesspolicies/"
+	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
+	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
+	// Check if the environment variable is set
+	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
+		fmt.Println("ENVs are not set")
+		return "", err
+	}
+	var Address = LokiEndpointAddress + AccessPolicyUrlPrefix + tenant
+	username := ""
+	password := string(LokiAdminApiToken)
+
+	auth := username + ":" + password
+	basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+
+	data := strings.NewReader(string(jsonData))
+
+	fmt.Println(data)
+	resp, err := http.NewRequest("PUT", Address, data)
+	if err != nil {
+		// Handle the error
+		fmt.Println(err, "unable to request")
+		return "", err
+	}
+	resp.Header.Set("Authorization", basicAuth)
+	resp.Header.Add("If-Match", "1")
+	resp.Header.Add("Content-Type", "text/plain")
+
+	client := &http.Client{}
+	result, err := client.Do(resp)
+	if err != nil {
+		// Handle the error
+		fmt.Println(err, "unable to get client result")
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code and handle accordingly
+	if result.StatusCode != http.StatusOK {
+		// Handle non-OK status codes
+	}
+
+	fmt.Println(result.Status)
+
+	return "", err
 }

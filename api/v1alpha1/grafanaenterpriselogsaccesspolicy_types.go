@@ -73,5 +73,8 @@ type GrafanaEnterpriseLogsAccessPolicyList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&GrafanaEnterpriseLogsAccessPolicy{}, &GrafanaEnterpriseLogsAccessPolicyList{})
+	SchemeBuilder.Register(
+		&GrafanaEnterpriseLogsAccessPolicy{},
+		&GrafanaEnterpriseLogsAccessPolicyList{},
+	)
 }

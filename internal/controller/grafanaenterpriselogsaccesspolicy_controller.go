@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -56,19 +57,19 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 	rlog := log.Log.WithValues("loki", req.NamespacedName)
 	rlog.Info("Reconciling AccessPolicy creation request")
 
-	// Fetch the GrafanaEnterpriseLogsAccessPolicy instance
-	instance := &lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy{}
-	err := r.Get(ctx, req.NamespacedName, instance)
+	// Fetch the GrafanaEnterpriseLogsTenant instance
+	var instance = &lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy{}
+	err := r.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
-		if client.IgnoreNotFound(err) != nil {
-			rlog.Error(err, "unable to list GrafanaEnterpriseLogsAccessPolicy")
-			return ctrl.Result{}, err
+		if errors.IsNotFound(err) {
+			// object not found, could have been deleted after
+			// reconcile request, hence don't requeue
+			return ctrl.Result{}, nil
 		}
-		// Request object not found, could have been deleted after reconcile request.
-		// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-		// Return and don't requeue
-		return ctrl.Result{}, nil
+		// error reading the object, requeue the request
+		return ctrl.Result{}, err
 	}
+
 	// Define the accessScope
 	var ac = instance.Spec.TenantInfoRef.AccessPolicies
 	var scopes []string
@@ -115,16 +116,31 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 		return ctrl.Result{}, err
 	}
 
+	// Add your finalizer when creating a new object.
 	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
-		// Object is being deleted, perform cleanup or other actions here
-
-		// Example: Delete associated resources or perform other cleanup
-		err := r.deleteAssociatedResources(ctx, instance)
-		if err != nil {
-			return ctrl.Result{}, err
+		if !containsString(instance.ObjectMeta.Finalizers, finalizerName) {
+			instance.ObjectMeta.Finalizers = append(instance.ObjectMeta.Finalizers, finalizerName)
+			if err := r.Update(context.Background(), instance); err != nil {
+				return ctrl.Result{}, err
+			}
 		}
+	} else {
+		// Object is being deleted.
+		if containsString(instance.ObjectMeta.Finalizers, finalizerName) {
 
-		// Object has been deleted, no need to requeue
+			// Example: Delete associated resources or perform other cleanup
+			err := r.deleteAssociatedResources(ctx, instance, realm, scopes, metadataName, err)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+
+			// Remove the finalizer.
+			instance.ObjectMeta.Finalizers = removeString(instance.ObjectMeta.Finalizers, finalizerName)
+			if err := r.Update(context.Background(), instance); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		// Return to allow Kubernetes to delete the object.
 		return ctrl.Result{}, nil
 	}
 
@@ -132,8 +148,25 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 }
 
 // deleteAssociatedResources performs the cleanup of associated resources
-func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) deleteAssociatedResources(ctx context.Context, obj *lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy) error {
+func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) deleteAssociatedResources(ctx context.Context, obj *lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy, realm map[string]interface{}, scopes []string, tenant string, err error) error {
 	// Your logic for deleting associated resources here...
+	data := map[string]interface{}{
+		"display_name": tenant,
+		"status":       "inactive",
+		"realms":       []map[string]interface{}{realm},
+		"scopes":       scopes,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshaling:", err)
+		return err
+	}
+
+	_, err = http.DeleteAccessPolicy(jsonData, tenant, err)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

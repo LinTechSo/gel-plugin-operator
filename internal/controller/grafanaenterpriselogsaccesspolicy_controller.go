@@ -94,9 +94,10 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 		"tenant":         tenant.TenantName,
 	}
 
+	var metadataName = instance.ObjectMeta.Name
 	data := map[string]interface{}{
-		"name":         tenant.TenantName,
-		"display_name": tenant.TenantName,
+		"name":         metadataName,
+		"display_name": metadataName,
 		"status":       "active",
 		"realms":       []map[string]interface{}{realm},
 		"scopes":       scopes,

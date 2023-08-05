@@ -18,7 +18,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -54,9 +53,6 @@ const finalizerName = "hamravesh.com/finalizer"
 func (r *GrafanaEnterpriseLogsTenantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	rlog := log.Log.WithValues("loki", req.NamespacedName)
-	rlog.Info("Reconciling tenant creation job")
-
 	// Fetch the GrafanaEnterpriseLogsTenant instance
 	var instance = &lokiv1alpha1.GrafanaEnterpriseLogsTenant{}
 	err := r.Get(context.TODO(), req.NamespacedName, instance)
@@ -66,21 +62,10 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) Reconcile(ctx context.Context, r
 			// reconcile request, hence don't requeue
 			return ctrl.Result{}, nil
 		}
-
 		// error reading the object, requeue the request
 		return ctrl.Result{}, err
 	}
-
-	var tenant = instance.Spec.TenantInfo
-
-	rlog.Info("Requesting Tennat creation")
-
-	var status = "active"
-
-	_, err = http.CreateTenantApiRequest(tenant.Name, tenant.DisplayName, tenant.ClusterName, status, err)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
+	log.Log.Info("Reconciling GrafanaEnterpriseLogsTenant", "instance", instance.Name)
 
 	// Add your finalizer when creating a new object.
 	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -90,21 +75,32 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) Reconcile(ctx context.Context, r
 				return ctrl.Result{}, err
 			}
 		}
+		log.Log.Info("Finalizing GrafanaEnterpriseLogsTenant", "instance", instance.Name)
+
+		// Create associated request or perform other cleanup
+		err := r.createAssociatedRequesForTenant(ctx, instance, err)
+		if err != nil {
+			log.Log.Error(err, "Failed to create associated request")
+			return ctrl.Result{}, err
+		}
+		log.Log.Info("Created associated request", "instance", instance.Name)
 	} else {
 		// Object is being deleted.
 		if containsString(instance.ObjectMeta.Finalizers, finalizerName) {
 
 			// Example: Delete associated resources or perform other cleanup
-			err := r.deleteAssociatedResources(ctx, instance, tenant.Name, tenant.DisplayName, tenant.ClusterName, err)
+			err := r.deleteAssociatedResources(ctx, instance, err)
 			if err != nil {
 				return ctrl.Result{}, err
 			}
+			log.Log.Info("Deleted associated resources", "instance", instance.Name)
 
 			// Remove the finalizer.
 			instance.ObjectMeta.Finalizers = removeString(instance.ObjectMeta.Finalizers, finalizerName)
 			if err := r.Update(context.Background(), instance); err != nil {
 				return ctrl.Result{}, err
 			}
+			log.Log.Info("Removed finalizer", "instance", instance.Name)
 		}
 		// Return to allow Kubernetes to delete the object.
 		return ctrl.Result{}, nil
@@ -117,16 +113,35 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) Reconcile(ctx context.Context, r
 	return ctrl.Result{}, nil
 }
 
-// deleteAssociatedResources performs the cleanup of associated resources
-func (r *GrafanaEnterpriseLogsTenantReconciler) deleteAssociatedResources(ctx context.Context, obj *lokiv1alpha1.GrafanaEnterpriseLogsTenant, tenant string, displayName string, clusterName string, err error) error {
-	// Your logic for deleting associated resources here...
-	var status = "inactive"
-	fmt.Println("Inactivate the tenant")
-	_, err = http.DeleteTenant(tenant, displayName, clusterName, status, err)
+// createAssociatedRequesForTenant performs the creation of associated tenant
+func (r *GrafanaEnterpriseLogsTenantReconciler) createAssociatedRequesForTenant(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsTenant, err error) error {
+	_ = log.FromContext(ctx)
+	var tenant = instance.Spec.TenantInfo
+	var status = "active"
+	var metadataName = instance.ObjectMeta.Name
+
+	_, err = http.CreateTenantApiRequest(ctx, tenant.Name, metadataName, tenant.ClusterName, status, err)
 	if err != nil {
 		return err
 	}
 
+	log.Log.Info("Create tenant API request", "tenant", tenant.Name, "instance", instance.Name)
+	return nil
+}
+
+// deleteAssociatedResources performs the cleanup of associated resources
+func (r *GrafanaEnterpriseLogsTenantReconciler) deleteAssociatedResources(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsTenant, err error) error {
+	_ = log.FromContext(ctx)
+
+	// Your logic for deleting associated resources here...
+	var status = "inactive"
+	var tenantInfo = instance.Spec.TenantInfo
+	_, err = http.DeleteTenant(ctx, tenantInfo.Name, tenantInfo.ClusterName, status, err)
+	if err != nil {
+		return err
+	}
+
+	log.Log.Info("Delete tenant API request", "tenant", tenantInfo.Name, "instance", instance.Name)
 	return nil
 }
 

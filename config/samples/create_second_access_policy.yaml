@@ -7,14 +7,10 @@ metadata:
     app.kubernetes.io/part-of: gel
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: gel
-  name: grafanaenterpriselogsaccesspolicy-sample
+  name: agent-second-access-policy
 spec:
   tenantInfoRef: 
-    tenantName: "parham"
+    tenantName: "angelina"
     clusterName: "loki"
     accessPolicies:
-      -  "logs:read"
-      -  "logs:write"
-    labelSelectors:
-      - '{foo="bar"}'
-      - '{name="hello"}'
+      -  "admin"

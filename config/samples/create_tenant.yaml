@@ -7,9 +7,9 @@ metadata:
     app.kubernetes.io/part-of: gel
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: gel
-  name: grafanaenterpriselogstenant-sample
+  name: angelina-tenant-test
 spec:
   tenantInfo:
-    name: "sara"
-    displayName: "sara"
+    name: "agent"
+    displayName: "Loki Enterprise Agent"
     clusterName: "loki"

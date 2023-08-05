@@ -50,6 +50,7 @@ type GrafanaEnterpriseLogsTenantStatus struct {
 type GrafanaEnterpriseLogsTenant struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Finalizers        []string `json:"finalizers,omitempty"`
 
 	Spec   GrafanaEnterpriseLogsTenantSpec   `json:"spec,omitempty"`
 	Status GrafanaEnterpriseLogsTenantStatus `json:"status,omitempty"`
@@ -65,5 +66,8 @@ type GrafanaEnterpriseLogsTenantList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&GrafanaEnterpriseLogsTenant{}, &GrafanaEnterpriseLogsTenantList{})
+	SchemeBuilder.Register(
+		&GrafanaEnterpriseLogsTenant{},
+		&GrafanaEnterpriseLogsTenantList{},
+	)
 }

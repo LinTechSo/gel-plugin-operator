@@ -10,6 +10,6 @@ metadata:
   name: grafanaenterpriselogstenant-sample
 spec:
   tenantInfo:
-    name: "parham"
-    displayName: "parham"
+    name: "sara"
+    displayName: "sara"
     clusterName: "loki"

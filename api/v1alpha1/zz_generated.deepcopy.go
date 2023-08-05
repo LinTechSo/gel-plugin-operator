@@ -45,6 +45,11 @@ func (in *GrafanaEnterpriseLogsAccessPolicy) DeepCopyInto(out *GrafanaEnterprise
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Finalizers != nil {
+		in, out := &in.Finalizers, &out.Finalizers
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	in.Spec.DeepCopyInto(&out.Spec)
 	out.Status = in.Status
 }
@@ -135,6 +140,11 @@ func (in *GrafanaEnterpriseLogsTenant) DeepCopyInto(out *GrafanaEnterpriseLogsTe
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Finalizers != nil {
+		in, out := &in.Finalizers, &out.Finalizers
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	out.Spec = in.Spec
 	out.Status = in.Status
 }
@@ -225,6 +235,11 @@ func (in *GrafanaEnterpriseLogsToken) DeepCopyInto(out *GrafanaEnterpriseLogsTok
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Finalizers != nil {
+		in, out := &in.Finalizers, &out.Finalizers
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	out.Spec = in.Spec
 	out.Status = in.Status
 }

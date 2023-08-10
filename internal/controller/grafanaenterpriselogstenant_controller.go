@@ -67,7 +67,7 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) Reconcile(ctx context.Context, r
 	}
 	log.Log.Info("Reconciling GrafanaEnterpriseLogsTenant", "instance", instance.Name)
 
-	// Add your finalizer when creating a new object.
+	// Add finalizer when creating a new object.
 	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(instance.ObjectMeta.Finalizers, finalizerName) {
 			instance.ObjectMeta.Finalizers = append(instance.ObjectMeta.Finalizers, finalizerName)
@@ -89,7 +89,7 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) Reconcile(ctx context.Context, r
 		if containsString(instance.ObjectMeta.Finalizers, finalizerName) {
 
 			// Example: Delete associated resources or perform other cleanup
-			err := r.deleteAssociatedResources(ctx, instance, err)
+			err := r.deleteAssociatedResourcesForTenant(ctx, instance, err)
 			if err != nil {
 				return ctrl.Result{}, err
 			}
@@ -130,7 +130,7 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) createAssociatedRequesForTenant(
 }
 
 // deleteAssociatedResources performs the cleanup of associated resources
-func (r *GrafanaEnterpriseLogsTenantReconciler) deleteAssociatedResources(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsTenant, err error) error {
+func (r *GrafanaEnterpriseLogsTenantReconciler) deleteAssociatedResourcesForTenant(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsTenant, err error) error {
 	_ = log.FromContext(ctx)
 
 	// Your logic for deleting associated resources here...

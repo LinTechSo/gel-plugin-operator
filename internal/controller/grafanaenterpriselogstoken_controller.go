@@ -19,10 +19,13 @@ package controller
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	// http "github.com/LinTechSo/gel-plugin-operator/internal/http"
 
 	lokiv1alpha1 "github.com/LinTechSo/gel-plugin-operator/api/v1alpha1"
 )
@@ -49,7 +52,79 @@ type GrafanaEnterpriseLogsTokenReconciler struct {
 func (r *GrafanaEnterpriseLogsTokenReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
+	// Fetch the GrafanaEnterpriseLogsTenant instance
+	var instance = &lokiv1alpha1.GrafanaEnterpriseLogsToken{}
+	err := r.Get(context.TODO(), req.NamespacedName, instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// object not found, could have been deleted after
+			// reconcile request, hence don't requeue
+			log.Log.Info("GrafanaEnterpriseLogsToken resource not found. Ignoring since object might be deleted")
+			return ctrl.Result{}, nil
+		}
+		// error reading the object, requeue the request
+		return ctrl.Result{}, err
+	}
+	log.Log.Info("Reconciling GrafanaEnterpriseLogsToken", "instance", instance.Name)
+
+	// Add finalizer when creating a new object.
+	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !containsString(instance.ObjectMeta.Finalizers, finalizerName) {
+			instance.ObjectMeta.Finalizers = append(instance.ObjectMeta.Finalizers, finalizerName)
+			if err := r.Update(context.Background(), instance); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		log.Log.Info("Finalizing GrafanaEnterpriseLogsToken", "instance", instance.Name)
+
+		// Create associated request or perform other cleanup
+		err := r.createAssociatedRequesForToken(ctx, instance, err)
+		if err != nil {
+			log.Log.Error(err, "Failed to create associated request")
+			return ctrl.Result{}, err
+		}
+		log.Log.Info("Created associated request", "instance", instance.Name)
+	} else {
+		// Object is being deleted.
+		if containsString(instance.ObjectMeta.Finalizers, finalizerName) {
+
+			// Example: Delete associated resources or perform other cleanup
+			err := r.deleteAssociatedResourcesForToken(ctx, instance, err)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+			log.Log.Info("Deleted associated resources", "instance", instance.Name)
+
+			// Remove the finalizer.
+			instance.ObjectMeta.Finalizers = removeString(instance.ObjectMeta.Finalizers, finalizerName)
+			if err := r.Update(context.Background(), instance); err != nil {
+				return ctrl.Result{}, err
+			}
+			log.Log.Info("Removed finalizer", "instance", instance.Name)
+		}
+		// Return to allow Kubernetes to delete the object.
+		return ctrl.Result{}, nil
+	}
+
+	if err := r.Status().Update(ctx, instance); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
+}
+
+// createAssociatedRequesForTenant performs the creation of associated token
+func (r *GrafanaEnterpriseLogsTokenReconciler) createAssociatedRequesForToken(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsToken, err error) error {
+	_ = log.FromContext(ctx)
+
+	return nil
+}
+
+// deleteAssociatedResources performs the cleanup of associated resources
+func (r *GrafanaEnterpriseLogsTokenReconciler) deleteAssociatedResourcesForToken(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsToken, err error) error {
+	_ = log.FromContext(ctx)
+
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

@@ -68,7 +68,7 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 	}
 	log.Log.Info("Reconciling GrafanaEnterpriseLogsAccessPolicy", "instance", instance.Name)
 
-	// initialize realm
+	// initialize the realm
 	realm, scopes, err := r.jsondataImplementation(ctx, instance)
 	if err != nil {
 		log.Log.Error(err, "Failed to prepare the desired state of GrafanaEnterpriseLogs AccessPolicy realm and scopes")
@@ -76,7 +76,7 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 	}
 	log.Log.Info("Prepare the desired state of GrafanaEnterpriseLogs AccessPolicy realm and scopes")
 
-	// Add your finalizer when creating a new object.
+	// Add finalizer when creating a new object.
 	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
 		if !containsString(instance.ObjectMeta.Finalizers, finalizerName) {
 			instance.ObjectMeta.Finalizers = append(instance.ObjectMeta.Finalizers, finalizerName)
@@ -97,7 +97,7 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) Reconcile(ctx context.Cont
 		if containsString(instance.ObjectMeta.Finalizers, finalizerName) {
 
 			// Delete associated resources or perform other cleanup
-			err := r.deleteAssociatedResources(ctx, instance, realm, scopes)
+			err := r.deleteAssociatedResourcesForAccessPolicy(ctx, instance, realm, scopes)
 			if err != nil {
 				log.Log.Error(err, "Failed to delete associated resources")
 				return ctrl.Result{}, err
@@ -182,7 +182,7 @@ func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) createAssociatedRequestFor
 }
 
 // deleteAssociatedResources performs the cleanup of associated resources
-func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) deleteAssociatedResources(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy, realm map[string]interface{}, scopes []string) error {
+func (r *GrafanaEnterpriseLogsAccessPolicyReconciler) deleteAssociatedResourcesForAccessPolicy(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsAccessPolicy, realm map[string]interface{}, scopes []string) error {
 	// Your logic for deleting associated resources here...
 	var metadataName = instance.ObjectMeta.Name
 	data := map[string]interface{}{

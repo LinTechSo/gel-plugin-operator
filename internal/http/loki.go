@@ -12,6 +12,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
+// export Loki_Endpoint_Api_Version=v3
+// export Loki_Admin_Api_Token=X
+// export Loki_Endpoint_Address=http://localhost:3100
 func ReadEnvironmentVariables(ctx context.Context, err error) (string, string, string, error) {
 	_ = log.FromContext(ctx)
 
@@ -34,6 +37,7 @@ func ReadEnvironmentVariables(ctx context.Context, err error) (string, string, s
 	return "", "", "", err
 }
 
+// Creation methods
 func CreateAccessPolicyApiRequest(ctx context.Context, AccessPolicyData []byte, err error) (string, error) {
 	_ = log.FromContext(ctx)
 
@@ -119,10 +123,51 @@ func CreateTenantApiRequest(ctx context.Context, TenantName string, DisplayName 
 	return "", err
 }
 
-func CreateTokenApiRequest() {
-	fmt.Println("Hello from CreateTokenApiRequest")
+func CreateTokenApiRequest(ctx context.Context, TokenName string, DisplayName string, TokenExpiration string, AccessPolicyName string, status string, err error) (*http.Response, error) {
+	_ = log.FromContext(ctx)
+
+	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
+	var Address = LokiEndpointAddress + UrlPrefix + "tokens/"
+	log.Log.Info("Endpoint Address", "URL", Address)
+
+	username := ""
+	password := string(LokiAdminApiToken)
+
+	auth := username + ":" + password
+	basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+
+	postData := strings.NewReader(
+		fmt.Sprintf(
+			`{"name":"%s","display_name":"%s","expiration":"%s", "access_policy":"%s", "status":"%s"}`, TokenName, DisplayName, TokenExpiration, AccessPolicyName, status),
+	)
+	fmt.Println("Create tenant API request", postData)
+
+	resp, err := http.NewRequest("POST", Address, postData)
+	if err != nil {
+		log.Log.Error(err, "unable to request", "result", resp)
+		return nil, err
+	}
+	resp.Header.Set("Authorization", basicAuth)
+	resp.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	result, err := client.Do(resp)
+	if err != nil {
+		log.Log.Error(err, "unable to get client result", "result", result)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code and handle accordingly
+	if result.StatusCode != http.StatusOK {
+		log.Log.Info("Failed status ")
+	}
+	log.Log.Info("token request ", "result", result)
+	log.Log.Info("token request ", "code status", result.Status)
+	return result, err
 }
 
+// Deletion methods
 func DeleteTenant(ctx context.Context, TenantName string, ClusterName string, status string, err error) (string, error) {
 	_ = log.FromContext(ctx)
 
@@ -210,4 +255,8 @@ func DeleteAccessPolicy(ctx context.Context, jsonData []byte, tenant string, err
 
 	log.Log.Info("Access Policy deletion request code", "status", result.Status)
 	return "", err
+}
+
+func DeleteToken() {
+	fmt.Println("Hello from DeleteToken")
 }

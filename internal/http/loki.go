@@ -12,18 +12,33 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
+func ReadEnvironmentVariables(ctx context.Context, err error) (string, string, string, error) {
+	_ = log.FromContext(ctx)
+
+	var LokiEndpointApiVersion = os.Getenv("Loki_Endpoint_Api_Version")
+	if LokiEndpointApiVersion == "v3" {
+		var UrlPrefix = "/admin/api/v3/"
+		var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
+		var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
+		// Check if the environment variable is set
+		if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
+			log.Log.Error(err, "Loki Endpoint Address or Loki Admin Api Token is not set")
+			return "", "", "", err
+		}
+
+		return LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, nil
+	} else {
+		log.Log.Info("Loki Endpoint Api Version v3 just supported at this time")
+	}
+	log.Log.Error(err, "Loki Admin API Version is not set")
+	return "", "", "", err
+}
+
 func CreateAccessPolicyApiRequest(ctx context.Context, AccessPolicyData []byte, err error) (string, error) {
 	_ = log.FromContext(ctx)
 
-	var AccessPolicyUrlPrefix = "/admin/api/v3/accesspolicies"
-	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
-	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
-	// Check if the environment variable is set
-	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
-		log.Log.Error(err, "Loki Endpoint Address or Loki Admin Api Token is not set")
-		return "", err
-	}
-	var Address = LokiEndpointAddress + AccessPolicyUrlPrefix
+	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
+	var Address = LokiEndpointAddress + UrlPrefix + "accesspolicies/"
 	log.Log.Info("Endpoint Address", "URL", Address)
 
 	username := ""
@@ -63,16 +78,8 @@ func CreateAccessPolicyApiRequest(ctx context.Context, AccessPolicyData []byte, 
 func CreateTenantApiRequest(ctx context.Context, TenantName string, DisplayName string, ClusterName string, status string, err error) (string, error) {
 	_ = log.FromContext(ctx)
 
-	var tenantUrlPrefix = "/admin/api/v3/tenants"
-	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
-	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
-	// Check if the environment variable is set
-	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
-		log.Log.Error(err, "Loki Endpoint Address or Loki Admin Api Token is not set")
-		return "", err
-	}
-
-	var Address = LokiEndpointAddress + tenantUrlPrefix
+	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
+	var Address = LokiEndpointAddress + UrlPrefix + "tenants/"
 	log.Log.Info("Endpoint Address", "URL", Address)
 
 	username := ""
@@ -119,16 +126,8 @@ func CreateTokenApiRequest() {
 func DeleteTenant(ctx context.Context, TenantName string, ClusterName string, status string, err error) (string, error) {
 	_ = log.FromContext(ctx)
 
-	var tenantUrlPrefix = "/admin/api/v3/tenants/"
-	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
-	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
-	// Check if the environment variable is set
-	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
-		log.Log.Error(err, "Loki Endpoint Address or Loki Admin Api Token is not set")
-		return "", err
-	}
-
-	var Address = LokiEndpointAddress + tenantUrlPrefix + TenantName
+	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
+	var Address = LokiEndpointAddress + UrlPrefix + "tenants/" + TenantName
 	log.Log.Info("Endpoint Address", "URL", Address)
 
 	username := ""
@@ -174,15 +173,8 @@ func DeleteTenant(ctx context.Context, TenantName string, ClusterName string, st
 func DeleteAccessPolicy(ctx context.Context, jsonData []byte, tenant string, err error) (string, error) {
 	_ = log.FromContext(ctx)
 
-	var AccessPolicyUrlPrefix = "/admin/api/v3/accesspolicies/"
-	var LokiEndpointAddress = os.Getenv("Loki_Endpoint_Address")
-	var LokiAdminApiToken = os.Getenv("Loki_Admin_Api_Token")
-	// Check if the environment variable is set
-	if LokiEndpointAddress == "" && LokiAdminApiToken == "" {
-		log.Log.Error(err, "Loki Endpoint Address or Loki Admin Api Token is not set")
-		return "", err
-	}
-	var Address = LokiEndpointAddress + AccessPolicyUrlPrefix + tenant
+	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
+	var Address = LokiEndpointAddress + UrlPrefix + "accesspolicies/" + tenant
 	log.Log.Info("Endpoint Address", "URL", Address)
 
 	username := ""

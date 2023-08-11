@@ -27,6 +27,8 @@ spec:
 ```
 result:
 
+<img width="1450" alt="Screenshot 1402-05-20 at 12 35 36" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/34be9fcc-1004-4ea6-856a-689cd69b7fc1">
+
 2. Create a LBAC
 
 ```
@@ -47,6 +49,8 @@ spec:
 ```
 result:
 
+<img width="1200" alt="Screenshot 1402-05-20 at 12 30 35" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/7f61c373-c302-4d47-bd5a-7a76c3f0438a">
+
 3. Create a Token
 
 ```
@@ -61,10 +65,12 @@ spec:
 ```
 result:
 
+<img width="1202" alt="Screenshot 1402-05-20 at 12 31 21" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/a2f1eae8-55a8-4845-97c0-028d1e963084">
+
 ```
 $kubctl get secrets/lintechso-token -o yaml
-
-
+```
+```
 apiVersion: v1
 data:
   token: xxxxxxxxx

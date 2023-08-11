@@ -42,7 +42,7 @@ func CreateAccessPolicyApiRequest(ctx context.Context, AccessPolicyData []byte, 
 	_ = log.FromContext(ctx)
 
 	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
-	var Address = LokiEndpointAddress + UrlPrefix + "accesspolicies/"
+	var Address = LokiEndpointAddress + UrlPrefix + "accesspolicies"
 	log.Log.Info("Endpoint Address", "URL", Address)
 
 	username := ""
@@ -83,7 +83,7 @@ func CreateTenantApiRequest(ctx context.Context, TenantName string, DisplayName 
 	_ = log.FromContext(ctx)
 
 	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
-	var Address = LokiEndpointAddress + UrlPrefix + "tenants/"
+	var Address = LokiEndpointAddress + UrlPrefix + "tenants"
 	log.Log.Info("Endpoint Address", "URL", Address)
 
 	username := ""
@@ -127,7 +127,7 @@ func CreateTokenApiRequest(ctx context.Context, TokenName string, DisplayName st
 	_ = log.FromContext(ctx)
 
 	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
-	var Address = LokiEndpointAddress + UrlPrefix + "tokens/"
+	var Address = LokiEndpointAddress + UrlPrefix + "tokens"
 	log.Log.Info("Endpoint Address", "URL", Address)
 
 	username := ""
@@ -162,7 +162,6 @@ func CreateTokenApiRequest(ctx context.Context, TokenName string, DisplayName st
 	if result.StatusCode != http.StatusOK {
 		log.Log.Info("Failed status ")
 	}
-	log.Log.Info("token request ", "result", result)
 	log.Log.Info("token request ", "code status", result.Status)
 	return result, err
 }
@@ -257,6 +256,49 @@ func DeleteAccessPolicy(ctx context.Context, jsonData []byte, tenant string, err
 	return "", err
 }
 
-func DeleteToken() {
-	fmt.Println("Hello from DeleteToken")
+func DeleteToken(ctx context.Context, tokenMetadataName string, status string, err error) (string, error) {
+	_ = log.FromContext(ctx)
+
+	LokiAdminApiToken, LokiEndpointAddress, UrlPrefix, err := ReadEnvironmentVariables(ctx, err)
+	var Address = LokiEndpointAddress + UrlPrefix + "tokens/" + tokenMetadataName
+	log.Log.Info("Endpoint Address", "URL", Address)
+
+	username := ""
+	password := string(LokiAdminApiToken)
+
+	auth := username + ":" + password
+	basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+
+	postData := strings.NewReader(
+		fmt.Sprintf(
+			`{"status":"%s"}`, status),
+	)
+	fmt.Println("DELETE tenant API request", postData)
+
+	resp, err := http.NewRequest("PUT", Address, postData)
+	if err != nil {
+		// Handle the error
+		log.Log.Error(err, "unable to request", "URL", Address)
+		return "", err
+	}
+
+	resp.Header.Set("Authorization", basicAuth)
+	resp.Header.Add("If-Match", "1")
+	resp.Header.Add("Content-Type", "text/plain")
+
+	client := &http.Client{}
+	result, err := client.Do(resp)
+	if err != nil {
+		log.Log.Error(err, "unable to get client result", "URL", Address)
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code and handle accordingly
+	if result.StatusCode != http.StatusOK {
+		log.Log.Info("Failed status code")
+	}
+
+	log.Log.Info("Token deletion request code", "status", result.Status)
+	return "", err
 }

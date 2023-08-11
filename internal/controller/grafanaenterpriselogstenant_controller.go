@@ -120,6 +120,7 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) createAssociatedRequesForTenant(
 	var status = "active"
 	var metadataName = instance.ObjectMeta.Name
 
+	// Creating associated resources here
 	_, err = http.CreateTenantApiRequest(ctx, tenant.Name, metadataName, tenant.ClusterName, status, err)
 	if err != nil {
 		return err
@@ -129,11 +130,11 @@ func (r *GrafanaEnterpriseLogsTenantReconciler) createAssociatedRequesForTenant(
 	return nil
 }
 
-// deleteAssociatedResources performs the cleanup of associated resources
+// deleteAssociatedResourcesForTenant performs the cleanup of associated resources
 func (r *GrafanaEnterpriseLogsTenantReconciler) deleteAssociatedResourcesForTenant(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsTenant, err error) error {
 	_ = log.FromContext(ctx)
 
-	// Your logic for deleting associated resources here...
+	// Deleting associated resources here
 	var status = "inactive"
 	var tenantInfo = instance.Spec.TenantInfo
 	_, err = http.DeleteTenant(ctx, tenantInfo.Name, tenantInfo.ClusterName, status, err)

@@ -18,14 +18,18 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
+	"time"
 
+	http "github.com/LinTechSo/gel-plugin-operator/internal/http"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	// http "github.com/LinTechSo/gel-plugin-operator/internal/http"
 
 	lokiv1alpha1 "github.com/LinTechSo/gel-plugin-operator/api/v1alpha1"
 )
@@ -36,9 +40,20 @@ type GrafanaEnterpriseLogsTokenReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+var TokenStructureResponse struct {
+	Name         string    `json:"name"`
+	DisplayName  string    `json:"display_name"`
+	CreatedAt    time.Time `json:"created_at"`
+	Status       string    `json:"status"`
+	AccessPolicy string    `json:"access_policy"`
+	Expiration   time.Time `json:"expiration"`
+	Token        string    `json:"token"`
+}
+
 //+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstokens,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstokens/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstokens/finalizers,verbs=update
+// +kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -113,16 +128,64 @@ func (r *GrafanaEnterpriseLogsTokenReconciler) Reconcile(ctx context.Context, re
 	return ctrl.Result{}, nil
 }
 
-// createAssociatedRequesForTenant performs the creation of associated token
+// createAssociatedRequesForToken performs the creation of associated token
 func (r *GrafanaEnterpriseLogsTokenReconciler) createAssociatedRequesForToken(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsToken, err error) error {
 	_ = log.FromContext(ctx)
+
+	var status = "active"
+	var tokenMetadataName = instance.ObjectMeta.Name
+	var tokenMetadataNamespace = instance.ObjectMeta.Namespace
+	var AccessPolicyInfo = instance.Spec.AccessPolicyRef.Name
+	var AccessPolicyExpirationInfo = instance.Spec.ExpirationTime
+	result, err := http.CreateTokenApiRequest(ctx, tokenMetadataName, tokenMetadataName, AccessPolicyExpirationInfo, AccessPolicyInfo, status, err)
+	if err != nil {
+		return err
+	}
+
+	decoder := json.NewDecoder(result.Body)
+	err = decoder.Decode(&TokenStructureResponse)
+	if err != nil {
+		panic(err)
+	}
+
+	data := map[string]string{
+		"token": TokenStructureResponse.Token,
+	}
+	// Convert map values to Base64-encoded byte slices
+	encodedData := make(map[string][]byte)
+	for key, value := range data {
+		encodedData[key] = []byte(value)
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      tokenMetadataName,
+			Namespace: tokenMetadataNamespace,
+		},
+		Data: encodedData,
+		Type: corev1.SecretTypeOpaque,
+	}
+
+	_, err = ctrl.CreateOrUpdate(ctx, r.Client, secret, func() error {
+		return controllerutil.SetControllerReference(instance, secret, r.Scheme)
+	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-// deleteAssociatedResources performs the cleanup of associated resources
+// deleteAssociatedResourcesForToken performs the cleanup of associated resources
 func (r *GrafanaEnterpriseLogsTokenReconciler) deleteAssociatedResourcesForToken(ctx context.Context, instance *lokiv1alpha1.GrafanaEnterpriseLogsToken, err error) error {
 	_ = log.FromContext(ctx)
+
+	var status = "inactive"
+	var tokenMetadataName = instance.ObjectMeta.Name
+	_, err = http.DeleteToken(ctx, tokenMetadataName, status, err)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

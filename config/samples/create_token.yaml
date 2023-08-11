@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/part-of: gel
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: gel
-  name: agent-token
+  name: lintechso-token
 spec:
   accessPolicyRef: 
-    name: "agent-access-policy"
-  expirationTime: "2024-03-01T17:37:59.341728283Z"
+    name: "lintechso-access-policy"
+  expirationTime: "2025-03-01T17:37:59.341728283Z"

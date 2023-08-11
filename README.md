@@ -13,26 +13,30 @@ You’ll need a Kubernetes cluster to run against. You can use [KIND](https://si
 **Note:** Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
  
 1. Create a Tenant
+
 ```
 apiVersion: loki.hamravesh.com/v1alpha1
 kind: GrafanaEnterpriseLogsTenant
 metadata:
-  name: grafanaenterpriselogstenant-sample
+  name: lintechso-tenant
 spec:
   tenantInfo:
-    name: "mytenant"
-    displayName: "mytenant"
+    name: "lintechso"
+    displayName: "LinTechSo"
     clusterName: "loki"
 ```
+result:
+
 2. Create a LBAC
+
 ```
 apiVersion: loki.hamravesh.com/v1alpha1
 kind: GrafanaEnterpriseLogsAccessPolicy
 metadata:
-  name: grafanaenterpriselogsaccesspolicy-sample
+  name: lintechso-access-policy
 spec:
   tenantInfoRef: 
-    tenantName: "mytenant"
+    tenantName: "lintechso"
     clusterName: "loki"
     accessPolicies:
       -  "logs:read"
@@ -41,11 +45,39 @@ spec:
       - '{foo="bar"}'
       - '{name="hello"}'
 ```
+result:
 
+3. Create a Token
+
+```
+apiVersion: loki.hamravesh.com/v1alpha1
+kind: GrafanaEnterpriseLogsToken
+metadata:
+  name: lintechso-token
+spec:
+  accessPolicyRef: 
+    name: "lintechso-access-policy"
+  expirationTime: "2025-03-01T17:37:59.341728283Z"
+```
+result:
+
+```
+$kubctl get secrets/lintechso-token -o yaml
+
+
+apiVersion: v1
+data:
+  token: xxxxxxxxx
+kind: Secret
+metadata:
+  name: lintechso-token
+type: Opaque
+```
 
 ### Running on the cluster
 1. Checkout the deployment env
 ```
+export Loki_Endpoint_Api_Version=v3
 export Loki_Endpoint_Address="http://loki.com"
 export Loki_Admin_Api_Token="X"
 ```
@@ -93,6 +125,7 @@ which provide a reconcile function responsible for synchronizing resources until
 ### Test It Out
 1. Add Loki Endpoint credentials as an ENV
 ```
+export Loki_Endpoint_Api_Version=v3
 export Loki_Endpoint_Address="http://loki.com"
 export Loki_Admin_Api_Token="X"
 ```

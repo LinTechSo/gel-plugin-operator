@@ -7,10 +7,10 @@ metadata:
     app.kubernetes.io/part-of: gel
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: gel
-  name: agent-access-policy
+  name: lintechso-access-policy
 spec:
   tenantInfoRef: 
-    tenantName: "agent"
+    tenantName: "lintechso"
     clusterName: "loki"
     accessPolicies:
       -  "logs:read"

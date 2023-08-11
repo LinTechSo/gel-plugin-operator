@@ -7,9 +7,9 @@ metadata:
     app.kubernetes.io/part-of: gel
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: gel
-  name: angelina-tenant-test
+  name: lintechso-tenant
 spec:
   tenantInfo:
-    name: "agent"
-    displayName: "Loki Enterprise Agent"
+    name: "lintechso"
+    displayName: "LintechSo"
     clusterName: "loki"

@@ -8,3 +8,11 @@ spec:
     spec:
       containers:
       - name: manager
+      env:
+        - name: Loki_Endpoint_Api_Version
+          value: "v3"
+        - name: Loki_Endpoint_Address
+          value: "http://loki.com"
+        - name: Loki_Admin_Api_Token
+          value: "X"
+

@@ -37,9 +37,9 @@ type GrafanaEnterpriseLogsAccessPolicyReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogsaccesspolicies,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogsaccesspolicies/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogsaccesspolicies/finalizers,verbs=update
+//+kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogsaccesspolicies,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogsaccesspolicies/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogsaccesspolicies/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

@@ -2,7 +2,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: grafanaenterpriselogstokens.loki.hamravesh.com
+  name: grafanaenterpriselogstokens.loki.gelops.com
 spec:
   conversion:
     strategy: Webhook

@@ -1,4 +1,4 @@
-# GelOp
+# GelOps
 K8s Operator for Grafana Enterprise Logs plugin
 
 ## Description
@@ -6,7 +6,7 @@ Operator for tenant management and LBAC creation.
 
 For more information about Grafana Enterprise Logs visit [GEL](https://grafana.com/docs/enterprise-logs/latest/)
 
-**Note:** This Operator uses GEL v3 Admin API requests to create configurations
+**Note:** This Operator currently developed on GEL version 1.7.2
 
 ## Getting Started
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
@@ -15,7 +15,7 @@ You’ll need a Kubernetes cluster to run against. You can use [KIND](https://si
 1. Create a Tenant
 
 ```
-apiVersion: loki.hamravesh.com/v1alpha1
+apiVersion: loki.gelops.com/v1alpha1
 kind: GrafanaEnterpriseLogsTenant
 metadata:
   name: lintechso-tenant
@@ -27,12 +27,13 @@ spec:
 ```
 result:
 
-<img width="1450" alt="Screenshot 1402-05-20 at 12 35 36" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/34be9fcc-1004-4ea6-856a-689cd69b7fc1">
+<img width="1450" alt="Screenshot 1402-05-20 at 12 35 36" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/a18111d9-68a8-4329-9bda-c25e8b05dea7">
+
 
 2. Create a LBAC
 
 ```
-apiVersion: loki.hamravesh.com/v1alpha1
+apiVersion: loki.gelops.com/v1alpha1
 kind: GrafanaEnterpriseLogsAccessPolicy
 metadata:
   name: lintechso-access-policy
@@ -49,12 +50,13 @@ spec:
 ```
 result:
 
-<img width="1200" alt="Screenshot 1402-05-20 at 12 30 35" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/7f61c373-c302-4d47-bd5a-7a76c3f0438a">
+<img width="1200" alt="Screenshot 1402-05-20 at 12 30 35" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/3a9be440-a898-4b86-8b8e-4b5e873610b7">
+
 
 3. Create a Token
 
 ```
-apiVersion: loki.hamravesh.com/v1alpha1
+apiVersion: loki.gelops.com/v1alpha1
 kind: GrafanaEnterpriseLogsToken
 metadata:
   name: lintechso-token
@@ -65,11 +67,14 @@ spec:
 ```
 result:
 
-<img width="1202" alt="Screenshot 1402-05-20 at 12 31 21" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/a2f1eae8-55a8-4845-97c0-028d1e963084">
+<img width="1202" alt="Screenshot 1402-05-20 at 12 31 21" src="https://github.com/LinTechSo/gel-plugin-operator/assets/53074289/35da2f25-d76e-466d-9513-8a9d8a5cfb13">
+
 
 ```
 $kubctl get secrets/lintechso-token -o yaml
 ```
+
+
 ```
 apiVersion: v1
 data:

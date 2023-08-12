@@ -36,9 +36,9 @@ type GrafanaEnterpriseLogsTenantReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstenants,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstenants/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstenants/finalizers,verbs=update
+// +kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogstenants,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogstenants/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogstenants/finalizers,verbs=update
 const finalizerName = "hamravesh.com/finalizer"
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to

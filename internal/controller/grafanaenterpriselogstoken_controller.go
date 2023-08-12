@@ -50,9 +50,9 @@ var TokenStructureResponse struct {
 	Token        string    `json:"token"`
 }
 
-//+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstokens,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstokens/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=loki.hamravesh.com,resources=grafanaenterpriselogstokens/finalizers,verbs=update
+//+kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogstokens,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogstokens/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=loki.gelops.com,resources=grafanaenterpriselogstokens/finalizers,verbs=update
 // +kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to

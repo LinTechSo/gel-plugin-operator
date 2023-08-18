@@ -2,16 +2,14 @@
 K8s Operator for Grafana Enterprise Logs plugin
 
 ## Description
-Operator for tenant management and LBAC creation.
+Manage tenants and LBAC in a kubernetes friendly way!
 
 For more information about Grafana Enterprise Logs visit [GEL](https://grafana.com/docs/enterprise-logs/latest/)
 
-**Note:** This Operator currently developed on GEL version 1.7.2
+**Note:** This Operator currently developed on GEL version 1.7.x
 
 ## Getting Started
-You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
-**Note:** Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
- 
+
 1. Create a Tenant
 
 ```
